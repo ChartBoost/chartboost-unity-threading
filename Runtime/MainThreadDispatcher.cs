@@ -152,7 +152,7 @@ namespace Chartboost
         #if UNITY_EDITOR
         [InitializeOnLoadMethod]
         #endif
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void _initialize()
         {
             _context ??= SynchronizationContext.Current;

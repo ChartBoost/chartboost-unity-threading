@@ -1,6 +1,6 @@
 {
   "name": "com.chartboost.unity.threading",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "displayName": "Chartboost Threading",
   "description": "Reusable Threading Utilities for Chartboost's Unity Projects",
   "unity": "2022.3",
@@ -13,7 +13,7 @@
   },
   "hideInEditor": false,
   "dependencies": {
-    "com.chartboost.unity.utilities": "1.0.1",
-    "com.chartboost.unity.logging": "1.0.0"
+    "com.chartboost.unity.utilities": "1.0.2",
+    "com.chartboost.unity.logging": "1.1.0"
   }
 }
