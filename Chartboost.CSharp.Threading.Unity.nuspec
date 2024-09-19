@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Chartboost.CSharp.Threading.Unity</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <title>Chartboost Threading Utilities for Unity</title>
     <description>Reusable Threading Utilities for Chartboost's Unity Projects</description>
     <authors>Chartboost</authors>
@@ -13,8 +13,8 @@
     <tags>Chartboost, Ads, Mediation, Unity, cs</tags>
     <repository type="git" url="https://github.com/ChartBoost/chartboost-unity-threading"/>
     <dependencies>
-      <dependency id="Chartboost.CSharp.Utilities.Unity" version="1.0.1" />
-      <dependency id="Chartboost.CSharp.Logging.Unity" version="1.0.0" />
+      <dependency id="Chartboost.CSharp.Utilities.Unity" version="1.0.2" />
+      <dependency id="Chartboost.CSharp.Logging.Unity" version="1.1.0" />
     </dependencies>
   </metadata>
 </package>
