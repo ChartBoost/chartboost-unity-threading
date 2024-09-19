@@ -1,7 +1,7 @@
 {
     "name": "Chartboost.Threading",
     "rootNamespace": "Chartboost",
-    "references": [],
+    "references": ["GUID:6bde40fb2b0a540c2885617d2a4ef5af"],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

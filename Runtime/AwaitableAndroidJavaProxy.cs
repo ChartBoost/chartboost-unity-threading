@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Chartboost.Logging;
 using UnityEngine;
 
 namespace Chartboost
@@ -42,9 +43,9 @@ namespace Chartboost
             {
                 _taskCompletionSource.TrySetResult(_result);
             }
-            catch (ObjectDisposedException e)
+            catch (ObjectDisposedException exception)
             {
-                Debug.Log(e.Message);
+                LogController.LogException(exception);
             }
         }
 

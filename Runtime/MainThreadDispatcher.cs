@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Chartboost.Logging;
 using UnityEditor;
 using UnityEngine;
 
@@ -23,28 +24,85 @@ namespace Chartboost
         public static void Post(SendOrPostCallback callback) => _context.Post(callback, null);
 
         /// <summary>
-        /// Creates a <see cref="Task"/> that will be dispatched on the Unity Scheduler.
+        /// Creates and dispatches a <see cref="Task"/> to run on the Unity Scheduler.
         /// </summary>
-        /// <param name="task"><see cref="Task"/> to be dispatched.</param>
-        /// <typeparam name="T">Result type.</typeparam>
-        /// <returns>The result form the Unity task.</returns>
-        public static void MainThreadTask<T>(Func<T> task)
+        /// <param name="task">The <see cref="Action"/> to be executed on the Unity Scheduler.</param>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the asynchronous operation. This <see cref="Task"/>
+        /// will log any exceptions that occur during its execution using the Unity logging system.
+        /// </returns>
+        public static Task MainThreadTask(Action task)
         {
             var ret = Task.Factory.StartNew(task, CancellationToken.None, TaskCreationOptions.None, _unityScheduler);
             ret.AppendExceptionLogging();
+            return ret;
+        }
+        
+        /// <summary>
+        /// Creates and dispatches a <see cref="Task"/> to run on the Unity Scheduler.
+        /// </summary>
+        /// <param name="task">The <see cref="Func{Task}"/> to be executed on the Unity Scheduler.</param>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the asynchronous operation. This <see cref="Task"/>
+        /// will log any exceptions that occur during its execution using the Unity logging system.
+        /// </returns>
+        public static Task MainThreadTask(Func<Task> task)
+        {
+            var ret = Task.Factory.StartNew(task, CancellationToken.None, TaskCreationOptions.None, _unityScheduler).Unwrap();
+            ret.AppendExceptionLogging();
+            return ret;
+        }
+        
+        /// <summary>
+        /// Creates and dispatches a <see cref="Task"/> with a parameter to run on the Unity Scheduler.
+        /// </summary>
+        /// <typeparam name="T">The type of the parameter passed to the task.</typeparam>
+        /// <param name="task">The <see cref="Func{Object, Task}"/> to be executed on the Unity Scheduler.</param>
+        /// <param name="parameter">The parameter to pass to the task.</param>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the asynchronous operation. This <see cref="Task"/>
+        /// will log any exceptions that occur during its execution using the Unity logging system.
+        /// </returns>
+        public static Task MainThreadTask<T>(Func<object, Task> task, T parameter)
+        {
+            var ret = Task.Factory.StartNew(task, parameter, CancellationToken.None, TaskCreationOptions.None, _unityScheduler).Unwrap();
+            ret.AppendExceptionLogging();
+            return ret;
+        }
+        
+        /// <summary>
+        /// Creates and dispatches a <see cref="Task{TResult}"/> to run on the Unity Scheduler.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result produced by the task.</typeparam>
+        /// <param name="task">The <see cref="Func{Task{TResult}}"/> to be executed on the Unity Scheduler.</param>
+        /// <returns>
+        /// A <see cref="Task{TResult}"/> that represents the asynchronous operation. This <see cref="Task"/>
+        /// will log any exceptions that occur during its execution using the Unity logging system and will 
+        /// return the result of type <typeparamref name="TResult"/> upon completion.
+        /// </returns>
+        public static Task<TResult> MainThreadTask<TResult>(Func<Task<TResult>> task)
+        {
+            var ret = Task.Factory.StartNew(task, CancellationToken.None, TaskCreationOptions.None, _unityScheduler).Unwrap();
+            ret.AppendExceptionLogging();
+
+            return ret;
         }
 
         /// <summary>
-        /// Creates a <see cref="Task{TResult}"/> that will be dispatched on the Unity Scheduler.
+        /// Creates and dispatches a <see cref="Task{TResult}"/> with a parameter to run on the Unity Scheduler.
         /// </summary>
-        /// <param name="task"><see cref="Task{TResult}"/> to be dispatched.</param>
-        /// <param name="parameter">Parameter to pass into <see cref="Task{TResult}"/> </param>
-        /// <typeparam name="T">Parameter type.</typeparam>
-        /// <typeparam name="TResult">Result type.</typeparam>
-        /// <returns></returns>
-        public static Task<TResult> MainThreadTask<T, TResult>(Func<object, TResult> task, T parameter)
+        /// <typeparam name="T">The type of the parameter passed to the task.</typeparam>
+        /// <typeparam name="TResult">The type of the result produced by the task.</typeparam>
+        /// <param name="task">The <see cref="Func{Object, Task{TResult}}"/> to be executed on the Unity Scheduler.</param>
+        /// <param name="parameter">The parameter to pass to the task.</param>
+        /// <returns>
+        /// A <see cref="Task{TResult}"/> that represents the asynchronous operation. This <see cref="Task"/>
+        /// will log any exceptions that occur during its execution using the Unity logging system and will
+        /// return the result of type <typeparamref name="TResult"/> upon completion.
+        /// </returns>
+        public static Task<TResult> MainThreadTask<T, TResult>(Func<object, Task<TResult>> task, T parameter)
         {
-            var ret = Task.Factory.StartNew(task, parameter, CancellationToken.None, TaskCreationOptions.None, _unityScheduler);
+            var ret = Task.Factory.StartNew(task, parameter, CancellationToken.None, TaskCreationOptions.None, _unityScheduler).Unwrap();
             ret.AppendExceptionLogging();
             return ret;
         }
@@ -86,8 +144,7 @@ namespace Chartboost
         }
 
         private static void AppendExceptionLogging(this Task inputTask) 
-            // TODO - Debug using ChartboostLogger when available
-            => inputTask.ContinueWith(faultedTask => Debug.LogException(faultedTask.Exception), TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
+            => inputTask.ContinueWith(faultedTask => LogController.LogException(faultedTask.Exception), TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
 
         private static SynchronizationContext _context;
         private static TaskScheduler _unityScheduler;
